@@ -1,6 +1,6 @@
 // backend/controllers/vehicleController.js
 
-const { Vehicle } = require("../models");
+const { Vehicle, Op } = require("../models");
 
 exports.getAllVehicles = async (req, res) => {
   console.log("Tentative de récupération de tous les véhicules");
@@ -120,6 +120,74 @@ exports.deleteVehicle = async (req, res) => {
     );
     res.status(500).json({
       message: "Erreur lors de la suppression du véhicule",
+      error: error.message,
+    });
+  }
+};
+
+exports.getUserVehicles = async (req, res) => {
+  try {
+    const vehicles = await Vehicle.findAll({
+      where: { userId: req.params.userId },
+    });
+    res.json(vehicles);
+  } catch (error) {
+    res.status(500).json({
+      message: "Erreur lors de la récupération des véhicules de l'utilisateur",
+      error: error.message,
+    });
+  }
+};
+
+exports.searchVehicles = async (req, res) => {
+  try {
+    const {
+      brand,
+      model,
+      color,
+      minYear,
+      maxYear,
+      minPrice,
+      maxPrice,
+      vehicleType,
+      fuelType,
+      transmission,
+      minMileage,
+      maxMileage,
+      minPower,
+      maxPower,
+      doors,
+    } = req.query;
+
+    let whereClause = {};
+
+    if (brand) whereClause.brand = { [Op.like]: `%${brand}%` };
+    if (model) whereClause.model = { [Op.like]: `%${model}%` };
+    if (color) whereClause.color = { [Op.like]: `%${color}%` };
+    if (minYear) whereClause.year = { ...whereClause.year, [Op.gte]: minYear };
+    if (maxYear) whereClause.year = { ...whereClause.year, [Op.lte]: maxYear };
+    if (minPrice)
+      whereClause.price = { ...whereClause.price, [Op.gte]: minPrice };
+    if (maxPrice)
+      whereClause.price = { ...whereClause.price, [Op.lte]: maxPrice };
+    if (vehicleType) whereClause.vehicleType = vehicleType;
+    if (fuelType) whereClause.fuelType = fuelType;
+    if (transmission) whereClause.transmission = transmission;
+    if (minMileage)
+      whereClause.mileage = { ...whereClause.mileage, [Op.gte]: minMileage };
+    if (maxMileage)
+      whereClause.mileage = { ...whereClause.mileage, [Op.lte]: maxMileage };
+    if (minPower)
+      whereClause.power = { ...whereClause.power, [Op.gte]: minPower };
+    if (maxPower)
+      whereClause.power = { ...whereClause.power, [Op.lte]: maxPower };
+    if (doors) whereClause.doors = doors;
+
+    const vehicles = await Vehicle.findAll({ where: whereClause });
+    res.json(vehicles);
+  } catch (error) {
+    res.status(500).json({
+      message: "Erreur lors de la recherche de véhicules",
       error: error.message,
     });
   }

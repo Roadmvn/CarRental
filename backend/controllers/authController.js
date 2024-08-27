@@ -9,14 +9,24 @@ const {
 
 exports.register = [
   // Validation des champs
+  check("username")
+    .not()
+    .isEmail()
+    .withMessage("Le nom d'utilisateur ne peut pas être une adresse email")
+    .isLength({ min: 3 })
+    .withMessage("Le nom d'utilisateur doit contenir au moins 3 caractères"),
   check("email").isEmail().withMessage("L'adresse email n'est pas valide"),
   check("password")
     .isLength({ min: 8 })
     .withMessage("Le mot de passe doit contenir au moins 8 caractères")
     .matches(/[A-Z]/)
     .withMessage("Le mot de passe doit contenir au moins une majuscule")
+    .matches(/[a-z]/)
+    .withMessage("Le mot de passe doit contenir au moins une minuscule")
     .matches(/[0-9]/)
-    .withMessage("Le mot de passe doit contenir au moins un chiffre"),
+    .withMessage("Le mot de passe doit contenir au moins un chiffre")
+    .matches(/[@$!%*?&]/)
+    .withMessage("Le mot de passe doit contenir au moins un caractère spécial"),
   check("firstName").notEmpty().withMessage("Le prénom est requis"),
   check("lastName").notEmpty().withMessage("Le nom est requis"),
   check("address").notEmpty().withMessage("L'adresse est requise"),
@@ -52,7 +62,7 @@ exports.register = [
       if (existingUser) {
         return res
           .status(400)
-          .json({ errors: [{ msg: "Ce nom d'utilisateur est déjà utilisé" }] });
+          .json({ errors: [{ msg: "Ce nom d'utilisateur est déj utilisé" }] });
       }
 
       const hashedPassword = await hashPassword(password);

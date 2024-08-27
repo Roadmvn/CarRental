@@ -26,5 +26,6 @@ router.delete(
   authorize("admin"),
   vehicleController.deleteVehicle
 );
+router.get("/search", vehicleController.searchVehicles);
 
 module.exports = router;
