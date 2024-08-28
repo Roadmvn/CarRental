@@ -68,13 +68,7 @@ class User extends Model {
         },
         phone: {
           type: DataTypes.STRING,
-          allowNull: false,
-          validate: {
-            is: {
-              args: /^[0-9+\-\s()]+$/,
-              msg: "Le numéro de téléphone n'est pas valide",
-            },
-          },
+          allowNull: true,
         },
         profilePicture: {
           type: DataTypes.STRING,
